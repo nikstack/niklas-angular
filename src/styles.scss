@@ -1,1 +1,105 @@
-/* You can add global styles to this file, and also import other style files */
+@import "theme";
+
+* {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  box-sizing: border-box;
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  overscroll-behavior-x: none;
+}
+
+.flex {
+  display: flex;
+
+  &.h-center {
+    justify-content: center;
+  }
+
+  &.v-center {
+    align-items: center;
+  }
+
+  .grow-1 {
+    flex-grow: 1;
+  }
+}
+
+div.list {
+  background-color: $colorBackground1;
+  border-radius: 10px;
+  overflow: hidden;
+  will-change: transform;
+
+
+  & > div {
+
+    &:not(:last-child) div.list-item {
+      border-bottom: 2px solid $colorBackground3;
+    }
+
+    div.wheel {
+      overflow-x: scroll;
+      max-height: 100vh;
+      transition-timing-function: ease-in;
+      transition: max-height 200ms;
+
+      div.wheel-action {
+        justify-content: flex-end;
+        background-color: red;
+        color: white;
+        padding: 0 16px;
+        transition-timing-function: linear;
+        transition: min-width 300ms;
+      }
+
+      div.wheel-action.min {
+        min-width: 0;
+      }
+
+      div.wheel-action.max {
+        min-width: 100%;
+      }
+
+
+      div.list-item {
+        padding: 16px;
+        transition: background-color 250ms;
+        width: 100%;
+        min-width: 100%;
+
+        &:hover {
+          background-color: $colorBackground3;
+        }
+      }
+    }
+  }
+}
+
+main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  color: $colorPrimary;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+

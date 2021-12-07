@@ -1,0 +1,30 @@
+<div class="list">
+
+
+  <div *ngFor="let todo of todos; let i = index" (click)="onListItemClicked(todo)">
+    <div class="wheel flex" #wheel>
+      <div class="wheel-action flex v-center" (click)="$event.stopPropagation();deleteTodo($event, todo.id!)">
+        Löschen
+      </div>
+      <div class="list-item flex v-center wheel-target">
+        <div [class]="todo.completed ? 'status completed' : 'status open'"
+             (click)="$event.stopPropagation(); toggleCompleted(todo)">
+          {{todo.completed ? '✓' : ''}}
+        </div>
+        <div class="content grow-1">
+          <p>{{todo.title}}</p>
+          <p><small>{{todo.description}}</small></p>
+        </div>
+      </div>
+    </div>
+    <!--draggable="true"
+    (dragstart)="dragStart()"
+    (dragover)="dragOver()"
+    (drop)="drop()"
+    (dragenter)="dragEnter()"
+    (dragleave)="dragLeave()"-->
+
+
+  </div>
+</div>
+

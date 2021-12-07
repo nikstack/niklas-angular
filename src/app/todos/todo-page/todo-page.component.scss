@@ -1,0 +1,32 @@
+@import "../../../theme";
+
+div.page {
+  background-color: $colorBackground2;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  transition: transform 350ms, border-top-left-radius 250ms, border-top-right-radius 250ms;
+
+  &.inBackground {
+    transform: scale(0.95) translateY(10px);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+}
+
+div.bottom-dialog {
+  position: fixed;
+  top: calc(100vh * 0.025 + 20px);
+  transform: translateY(100vh);
+  transition: transform 350ms;
+  width: 100vw;
+  height: calc(100vh * (0.95 + 0.025) - 20px);
+  background-color: $colorBackground1;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  overflow: auto;
+
+  &.show {
+    transform: translateY(0);
+  }
+}

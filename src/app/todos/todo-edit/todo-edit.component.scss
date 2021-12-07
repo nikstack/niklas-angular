@@ -1,0 +1,21 @@
+h1, p {
+  outline: none;
+}
+
+main {
+  height: 100%;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  div.action {
+    height: 24px;
+    min-height: 24px;
+  }
+
+  div.content {
+    flex-grow: 1;
+    overflow: auto;
+  }
+}

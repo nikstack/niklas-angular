@@ -1,0 +1,13 @@
+<main>
+  <div class="action flex v-center">
+    <button (click)="save()">Speichern</button>
+  </div>
+  <div class="content">
+    <h1 #title [contentEditable]="true">
+      {{todo.title}}
+    </h1>
+    <p #description [contentEditable]="true">
+      {{todo.description}}
+    </p>
+  </div>
+</main>

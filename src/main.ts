@@ -10,3 +10,8 @@ if (environment.production) {
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
+
+
+window.addEventListener('scroll', () => {
+  window.scrollTo(window.scrollX, 0);
+});

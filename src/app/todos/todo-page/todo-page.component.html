@@ -1,0 +1,21 @@
+<div class="page" [class.inBackground]="isBottomDialogShown">
+  <main>
+    <header class="flex v-center">
+      <h1>Todos</h1>
+      <span class="grow-1"></span>
+      <button (click)="showBottomDialog()">Hinzufügen</button>
+    </header>
+    <div>
+      <input type="file">
+    </div>
+    <app-todo-list [todos]="todos"
+                   (onSelect)="showBottomDialog($event)"
+                   (onDelete)="deleteTodo($event)"
+    ></app-todo-list>
+  </main>
+</div>
+<div class="bottom-dialog" [class.show]="isBottomDialogShown">
+  <app-todo-edit *ngIf="selectedTodo" [todo]="selectedTodo"
+                 (onSave)="save($event)"
+  ></app-todo-edit>
+</div>
