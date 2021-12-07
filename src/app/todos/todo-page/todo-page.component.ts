@@ -49,7 +49,7 @@ export class TodoPageComponent implements OnInit {
   }
 
   deleteTodo(todoId: string) {
-    this.todoService.deleteTodo(todoId);
+    this.todoService.delete(todoId);
     this.todos = this.todoService.todos;
   }
 }

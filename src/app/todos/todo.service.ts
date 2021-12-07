@@ -3,13 +3,14 @@ import { of } from "rxjs";
 import { Todo } from "./model/Todo";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
+import { TodoApiService } from "./todo-api.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodoService {
   constructor(
-    private readonly httpClient: HttpClient
+    private readonly todoProvider: TodoApiService
   ) {
   }
 
@@ -37,142 +38,38 @@ export class TodoService {
     this._filter = value;
   }
 
+
   getAll(callback: (todos: Todo[]) => void) {
-    this.httpClient.get<Todo[]>(environment.baseUrl)
+    this.todoProvider.getAll()
       .subscribe(todos => {
         this._todos = todos;
         callback(todos)
       })
-    /*of<Todo[]>(
-      [
-        {
-          id: '' + Math.random(),
-          title: "Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 Title 1 ",
-          description: "Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 ",
-          completed: false
-        },
-        {
-          id: '' + Math.random(),
-          title: "Title 1",
-          description: "Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 Description 1 ",
-          completed: false
-        },
-        {
-          id: '' + Math.random(),
-          title: "Title 1",
-          description: "Description 1",
-          completed: false
-        },
-        {
-          id: '' + Math.random(),
-          title: "Title 1",
-          description: "",
-          completed: false
-        },
-        /!*
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 1",
-                description: "Description 1",
-                completed: false
-              },
-              {
-                title: "Title 2",
-                description: "Description 2",
-                completed: true
-              }*!/
-      ]
-    ).subscribe(todos => {
-      this._todos = todos;
-    })*/
   }
-
 
   save(todo: Todo, callback: (todos: Todo[]) => void) {
     if (todo.title === '' && todo.description === '') {
       return;
     }
     if (todo.id) {
-      this.update(todo, callback);
+      this.todoProvider.update(todo)
+        .subscribe(todo => {
+          const index = this._todos.findIndex(t => t.id === todo.id)
+          this._todos[index] = todo;
+          callback(this.todos);
+        });
     } else {
-      this.add(todo, callback);
+      this.todoProvider.add(todo)
+        .subscribe(todo => {
+          this._todos.push(todo);
+          callback(this.todos);
+        });
     }
   }
 
-  deleteTodo(todoId: string) {
+  delete(todoId: string) {
     this._todos = this.todos.filter(todo => todo.id !== todoId);
-    this.httpClient.delete(environment.baseUrl + `/${todoId}`).subscribe();
-  }
-
-  private add(todo: Todo, callback: (todos: Todo[]) => void) {
-    this.httpClient.post<Todo>(environment.baseUrl, todo)
-      .subscribe(todo => {
-        this._todos.push(todo);
-        callback(this.todos);
-      })
-  }
-
-  private update(todo: Todo, callback: (todos: Todo[]) => void) {
-    this.httpClient.put<Todo>(environment.baseUrl, todo)
-      .subscribe(todo => {
-        const index = this._todos.findIndex(t => t.id === todo.id)
-        this._todos[index] = todo;
-        callback(this.todos);
-      })
+    this.todoProvider.delete(todoId).subscribe();
   }
 }
 
