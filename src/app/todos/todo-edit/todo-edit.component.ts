@@ -9,6 +9,7 @@ import { Todo } from "../model/Todo";
 export class TodoEditComponent implements OnInit {
 
   @Input() todo!: Todo;
+  @Output() onCancel = new EventEmitter<void>();
   @Output() onSave = new EventEmitter<Todo>();
 
   @ViewChild('title') titleInput!: ElementRef<HTMLHeadingElement>;
@@ -34,5 +35,9 @@ export class TodoEditComponent implements OnInit {
       description: description,
       completed: this.todo.completed
     });
+  }
+
+  cancel() {
+    this.onCancel.emit();
   }
 }

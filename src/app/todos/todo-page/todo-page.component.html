@@ -1,14 +1,14 @@
 <div class="page" [class.inBackground]="isBottomDialogShown">
   <main>
-    <header class="flex v-center">
+    <header>
+      <div class="flex">
+        <button (click)="toggleFilterUncompleted()">{{todoService.filterUncompleted ? 'Offen' : 'Alle'}}</button>
+        <span class="grow-1"></span>
+        <button (click)="showBottomDialog()">Hinzufügen</button>
+      </div>
       <h1>Todos</h1>
-      <span class="grow-1"></span>
-      <button (click)="showBottomDialog()">Hinzufügen</button>
     </header>
-    <div>
-      <input type="file">
-    </div>
-    <app-todo-list [todos]="todos"
+    <app-todo-list [todos]="todoBs | async"
                    (onSelect)="showBottomDialog($event)"
                    (onDelete)="deleteTodo($event)"
     ></app-todo-list>
@@ -17,5 +17,6 @@
 <div class="bottom-dialog" [class.show]="isBottomDialogShown">
   <app-todo-edit *ngIf="selectedTodo" [todo]="selectedTodo"
                  (onSave)="save($event)"
+                 (onCancel)="hideBottomDialog()"
   ></app-todo-edit>
 </div>

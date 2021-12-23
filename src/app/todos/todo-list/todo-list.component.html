@@ -1,7 +1,7 @@
 <div class="list">
 
 
-  <div *ngFor="let todo of todos; let i = index" (click)="onListItemClicked(todo)">
+  <div *ngFor="let todo of todos; let i = index" (click)="selectListItem(todo)">
     <div class="wheel flex" #wheel>
       <div class="wheel-action flex v-center" (click)="$event.stopPropagation();deleteTodo($event, todo.id!)">
         Löschen

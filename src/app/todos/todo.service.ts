@@ -1,79 +1,89 @@
 import { Injectable } from '@angular/core';
-import { of } from "rxjs";
 import { Todo } from "./model/Todo";
-import { HttpClient } from "@angular/common/http";
-import { environment } from "../../environments/environment";
 import { TodoApiService } from "./todo-api.service";
+import { BehaviorSubject } from "rxjs";
+import State from "../State";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodoService {
+
+  private todoState = new State<Todo[]>([]);
+  private todos: Todo[] = [];
+
   constructor(
     private readonly todoProvider: TodoApiService
   ) {
+    /*setInterval(() => {
+      this.todos = [...this.todos, {
+        id: '' + Math.random(),
+        title: 'Titel',
+        description: 'Description',
+        completed: Math.random() > 0.5
+      }];
+      this.todoBs.next(this.todos);
+    }, 1000)*/
   }
 
-  private _todos: Todo[] = [];
+  private _todoBs = new BehaviorSubject<Todo[]>(this.todos);
 
-  get todos(): Todo[] {
-    const matchesFilter = (todo: Todo) => {
-      if (this.filter.title && todo.title !== this.filter.title) {
-        return false;
-      }
-      return !(this.filter.completed && todo.completed !== this.filter.completed);
-
-    }
-
-    return this._todos.filter(todo => matchesFilter(todo))
+  get todoBs() {
+    return this._todoBs;
   }
 
-  private _filter: Filter = {};
+  private _filterUncompleted = false;
 
-  get filter(): Filter {
-    return this._filter;
+  get filterUncompleted() {
+    return this._filterUncompleted;
   }
 
-  set filter(value: Filter) {
-    this._filter = value;
+  filter(uncompleted: boolean) {
+    this._filterUncompleted = uncompleted;
+    this.todoBs.next(this.getFilteredTodos());
   }
 
-
-  getAll(callback: (todos: Todo[]) => void) {
+  getAll() {
     this.todoProvider.getAll()
       .subscribe(todos => {
-        this._todos = todos;
-        callback(todos)
+        this.todos = todos;
+        this.todoBs.next(this.getFilteredTodos());
       })
   }
 
-  save(todo: Todo, callback: (todos: Todo[]) => void) {
-    if (todo.title === '' && todo.description === '') {
+  save(saveTodo: Todo) {
+    if (saveTodo.title === '' && saveTodo.description === '') {
       return;
     }
-    if (todo.id) {
-      this.todoProvider.update(todo)
-        .subscribe(todo => {
-          const index = this._todos.findIndex(t => t.id === todo.id)
-          this._todos[index] = todo;
-          callback(this.todos);
+    if (saveTodo.id) {
+      this.todoProvider.update(saveTodo)
+        .subscribe(updatedTodo => {
+          this.todos = this.todos.map(todo => todo.id === updatedTodo.id ? updatedTodo : todo);
+          this.todoBs.next(this.getFilteredTodos());
         });
     } else {
-      this.todoProvider.add(todo)
-        .subscribe(todo => {
-          this._todos.push(todo);
-          callback(this.todos);
+      this.todoProvider.add(saveTodo)
+        .subscribe(addedTodo => {
+          this.todos = [...this.todos, addedTodo];
+          this.todoBs.next(this.getFilteredTodos());
         });
     }
   }
 
-  delete(todoId: string) {
-    this._todos = this.todos.filter(todo => todo.id !== todoId);
-    this.todoProvider.delete(todoId).subscribe();
+  delete(deleteTodoId: string) {
+    this.todoProvider.delete(deleteTodoId).subscribe(
+      () => {
+        this.todos = this.todos.filter(todo => todo.id !== deleteTodoId);
+        this.todoBs.next(this.getFilteredTodos());
+      }
+    );
   }
-}
 
-interface Filter {
-  title?: string;
-  completed?: boolean;
+  updateCompleted(todo: Todo, completed: boolean) {
+    this.save({ ...todo, completed })
+  }
+
+  private getFilteredTodos() {
+    return !this.filterUncompleted ? this.todos : this.todos.filter(todo => !todo.completed);
+  }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Todo } from "../model/Todo";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { TodoService } from "../todo.service";
 
 @Component({
@@ -10,9 +10,8 @@ import { TodoService } from "../todo.service";
 })
 export class TodoPageComponent implements OnInit {
 
-  todos: Todo[] = [];
-  todo = new Observable<Todo>();
   selectedTodo?: Todo = undefined;
+  todoBs = new BehaviorSubject<Todo[]>([]);
 
   constructor(
     public readonly todoService: TodoService
@@ -20,12 +19,14 @@ export class TodoPageComponent implements OnInit {
   }
 
 
+
   get isBottomDialogShown(): boolean {
     return this.selectedTodo !== undefined;
   }
 
   ngOnInit(): void {
-    this.todoService.getAll(todos => this.todos = todos);
+    this.todoService.getAll();
+    this.todoBs = this.todoService.todoBs;
   }
 
   hideBottomDialog() {
@@ -44,12 +45,15 @@ export class TodoPageComponent implements OnInit {
   }
 
   save(todo: Todo) {
-    this.todoService.save(todo, todos => this.todos = todos);
+    this.todoService.save(todo);
     this.hideBottomDialog();
   }
 
   deleteTodo(todoId: string) {
     this.todoService.delete(todoId);
-    this.todos = this.todoService.todos;
+  }
+
+  toggleFilterUncompleted() {
+    this.todoService.filter(!this.todoService.filterUncompleted);
   }
 }

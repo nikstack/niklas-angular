@@ -11,6 +11,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import { Todo } from "../model/Todo";
+import { TodoService } from "../todo.service";
 
 @Component({
   selector: 'app-todo-list',
@@ -18,12 +19,17 @@ import { Todo } from "../model/Todo";
   styleUrls: ['./todo-list.component.scss']
 })
 export class TodoListComponent implements OnInit, AfterViewInit, OnChanges {
-  @Input() todos: Todo[] = [];
+  @Input() todos: Todo[] | null = [];
   @Output() onSelect = new EventEmitter<Todo>();
   @Output() onDelete = new EventEmitter<string>();
   @ViewChildren('wheel') wheels!: QueryList<ElementRef<HTMLDivElement>>
   private dragStartIndex = 0
   private wheelTimeout: any;
+
+  constructor(
+    private readonly todoService: TodoService
+  ) {
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.wheels) {
@@ -41,7 +47,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnInit(): void {
   }
 
-  onListItemClicked(todo: Todo) {
+  selectListItem(todo: Todo) {
     this.onSelect.emit(todo);
   }
 
@@ -81,7 +87,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnChanges {
     listItems[toIndex].appendChild(itemOne);
   }*/
   toggleCompleted(todo: Todo) {
-    todo.completed = !todo.completed;
+    this.todoService.updateCompleted(todo, !todo.completed);
   }
 
   deleteTodo(event: MouseEvent, todoId: string) {
